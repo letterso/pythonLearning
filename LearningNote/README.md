@@ -2,7 +2,7 @@
 
 ## 面向对象简介
 
-- data  
+- date  
   2018/02/13
 - describe  
   Python的面向对象编程
