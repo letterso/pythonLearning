@@ -126,27 +126,22 @@ with open('/Users/michael/test.txt', 'w') as f:
 
 | Character | Meaning                                                      |
 | --------- | ------------------------------------------------------------ |
-| `'r'`     | 只读模式打开（默认）                                         |
-| `'w'`     | 只写模式打开，若文件不存在则新建                             |
-| `'x'`     | open for exclusive creation, failing if the file already exists |
-| `'a'`     | open for writing, appending to the end of the file if it exists |
-| `'b'`     | 二进制模式                                                   |
-| `'t'`     | 文本模式 (默认)                                              |
-| `'+'`     | open a disk file for updating (reading and writing)          |
-
-| Character | Meaning                                        |
-| --------- | ---------------------------------------------- |
-| w         | 以写方式打开                                   |
-| a         | 以追加模式打开 (从 EOF 开始, 必要时创建新文件) |
-| r+        | 以读写模式打开                                 |
-| w+        | 以读写模式打开 (参见 w )                       |
-| a+        | 以读写模式打开 (参见 a )                       |
-| rb        | 以二进制读模式打开                             |
-| wb        | 以二进制写模式打开 (参见 w )                   |
-| ab        | 以二进制追加模式打开 (参见 a )                 |
-| rb+       | 以二进制读写模式打开 (参见 r+ )                |
-| wb+       | 以二进制读写模式打开 (参见 w+ )                |
-| ab+       | 以二进制读写模式打开 (参见 a+ )                |
+| r         | 只读模式打开（默认）                                         |
+| w         | 只写模式打开，若文件不存在则新建                             |
+| x         | open for exclusive creation, failing if the file already exists |
+| a         | 以追加模式打开 (从 EOF 开始, 必要时创建新文件)               |
+| b         | 二进制模式                                                   |
+| t         | 文本模式 (默认)                                              |
+| +         | 以更新模式打开，可读可写                                     |
+| r+        | 以读写模式打开                                               |
+| w+        | 以读写模式打开 (参见 w )                                     |
+| a+        | 以读写模式打开 (参见 a )                                     |
+| rb        | 以二进制读模式打开                                           |
+| wb        | 以二进制写模式打开 (参见 w )                                 |
+| ab        | 以二进制追加模式打开 (参见 a )                               |
+| rb+       | 以二进制读写模式打开 (参见 r+ )                              |
+| wb+       | 以二进制读写模式打开 (参见 w+ )                              |
+| ab+       | 以二进制读写模式打开 (参见 a+ )                              |
 
 
 
