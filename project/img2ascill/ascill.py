@@ -39,7 +39,6 @@ if __name__ == '__main__':
 	for i in range(HEIGHT):
 		for j in range(WIDTH):
 			txt += get_char(*img.getpixel((j,i)))
-			#txt += get_char(*img.getpixel((j,i)))
 		txt +='\n'
 		
 	print(txt)
