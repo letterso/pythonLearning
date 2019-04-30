@@ -47,7 +47,18 @@ class GameField(object):
 		self.spawn()
 		self.spawn()
 	
-	def 
+	def move(self,direction):
+		def mov_row_left(row):
+			def tighten(row):
+				new_row = [i for i in row if i!=0]
+				new_row += [0 for i in range(len(row)-len(new_row))]
+				return new_row
+			
+			def merge(row):
+				
+				
+				
+		
 		
 
 # 状态机实现
@@ -57,9 +68,16 @@ def main(stdscr):
 		return 'game'
 	
 	def not_game(state):
+		responses = defaultdict(lambda:state)
+		responses['Restart'],responses['Exit'] = 'Init','Exit'
+		return responses[action]
 		
-	
 	def game():
+		if action == 'Restart':
+			return 'Init'
+		if aciton == 'Exit':
+			return 'Exit'
+		return 'Game'
 		
 	state_actions = {
 		'Init':init,
