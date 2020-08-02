@@ -1,3 +1,7 @@
+"""
+A*优化
+将人工势场值作为启发函数比例系数
+"""
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,6 +24,7 @@ class AStarPlanner:
         rr: robot radius[m]
         """
 
+        # A star参数
         self.resolution = resolution
         self.rr = rr
         self.min_x, self.min_y = 0, 0
@@ -28,6 +33,8 @@ class AStarPlanner:
         self.x_width, self.y_width = 0, 0
         self.motion = self.get_motion_model()
         self.calc_obstacle_map(ox, oy)
+
+        # potential_field参数
 
     class Node:
         def __init__(self, x, y, cost, parent_index):
@@ -136,8 +143,7 @@ class AStarPlanner:
 
         return rx, ry
 
-    @staticmethod
-    def calc_heuristic(n1, n2):
+    def calc_heuristic(self, n1, n2):
         w = 1.0  # weight of heuristic
         d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
 
@@ -207,17 +213,31 @@ class AStarPlanner:
                         self.obstacle_map[ix][iy] = True
                         break
 
-    def calc_potential_field(self, gx, gy, ox, oy, reso, rr, sx, sy):
-        # calc each potential
-        pmap = [[0.0 for i in range(yw)] for i in range(xw)]
+    def calc_potential_field(self, sx, sy, gx, gy, ox, oy, reso, rr):
+        """计算势力图，当终点和障碍物确定后，势力图也可以确定
 
-        for ix in range(xw):
-            x = ix * reso + minx
+        Args:
+            gx (double): [目标点x]
+            gy (double): [目标点y]
+            ox (list): [障碍物x]
+            oy (list): [障碍物y]
+            reso (double): [网格分辨率m]
+            rr (double): [机器人半径m]
+            sx (double): [起点x]
+            sy (double): [起点y]
 
-            for iy in range(yw):
-                y = iy * reso + miny
-                ug = calc_attractive_potential(x, y, gx, gy)
-                uo = calc_repulsive_potential(x, y, ox, oy, rr)
+        Returns:
+            [list]: [势力图]
+        """
+        pmap = [[0.0 for i in range(self.y_width)] for i in range(self.x_width)]
+
+        for ix in range(self.x_width):
+            x = ix * reso +self.min_x
+
+            for iy in range(self.y_width):
+                y = iy * reso + self.min_y
+                ug = self.calc_attractive_potential(x, y, gx, gy)
+                uo = self.calc_repulsive_potential(x, y, ox, oy, rr)
                 uf = ug + uo
                 pmap[ix][iy] = uf
 
@@ -227,33 +247,47 @@ class AStarPlanner:
         """计算引力
 
         Args:
-            cx ([type]): 当前点x
-            cy ([type]): 当前点y
-            gx ([type]): 目标点x
-            gy ([type]): 目标点y
+            cx (double): 当前点x
+            cy (double): 当前点y
+            gx (double): 目标点x
+            gy (double): 目标点y
 
         Returns:
-            [type]: 返回欧几里德范数sqrt(x*x + y*y)
+            [double]: 返回欧几里德范数sqrt(x*x + y*y)
         """
         return 0.5 * KP * np.hypot(cx - gx, cy - gy)
 
-    def calc_repulsive_potential(self,x, y, ox, oy, rr):
-        # search nearest obstacle
+    def calc_repulsive_potential(self,cx, cy, ox, oy, rr):
+        """计算斥力
+
+        Args:
+            cx (double): 当前点x
+            cy (double): 当前点y
+            ox (list): 障碍物x
+            oy (list)): 障碍物y
+            rr (double): 机器人半径
+
+        Returns:
+            [double]: 斥力
+        """
+        # 获取最近的障碍物
         minid = -1
         dmin = float("inf")
         for i, _ in enumerate(ox):
-            d = np.hypot(x - ox[i], y - oy[i])
+            d = np.hypot(cx - ox[i], cy - oy[i])
             if dmin >= d:
                 dmin = d
                 minid = i
 
-        # calc repulsive potential
-        dq = np.hypot(x - ox[minid], y - oy[minid])
+        # 计算与最近障碍物的欧式距离
+        dq = np.hypot(cx - ox[minid], cy - oy[minid])
 
+        # 判断是否小于机器人半径
         if dq <= rr:
             if dq <= 0.1:
                 dq = 0.1
 
+            # 计算斥力
             return 0.5 * ETA * (1.0 / dq - 1.0 / rr) ** 2
         else:
             return 0.0
