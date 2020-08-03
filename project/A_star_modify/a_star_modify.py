@@ -29,12 +29,12 @@ class AStarPlanner:
         self.rr = rr
         self.min_x, self.min_y = 0, 0
         self.max_x, self.max_y = 0, 0
+        self.ox = ox
+        self.oy = oy
         self.obstacle_map = None
         self.x_width, self.y_width = 0, 0
         self.motion = self.get_motion_model()
         self.calc_obstacle_map(ox, oy)
-
-        # potential_field参数
 
     class Node:
         def __init__(self, x, y, cost, parent_index):
@@ -61,6 +61,9 @@ class AStarPlanner:
             rx: x position list of the final path
             ry: y position list of the final path
         """
+
+        # potential_field参数
+        self.calc_potential_field(gx,gy, self.ox, self.oy,self.resolution,self.rr)
 
         start_node = self.Node(self.calc_xy_index(sx, self.min_x),
                                self.calc_xy_index(sy, self.min_y), 0.0, -1)
@@ -145,7 +148,7 @@ class AStarPlanner:
 
     def calc_heuristic(self, n1, n2):
         w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y)
+        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y) * self.pmap[n1.x][n2.y]
 
         return d
 
@@ -213,7 +216,7 @@ class AStarPlanner:
                         self.obstacle_map[ix][iy] = True
                         break
 
-    def calc_potential_field(self, sx, sy, gx, gy, ox, oy, reso, rr):
+    def calc_potential_field(self, gx, gy, ox, oy, reso, rr):
         """计算势力图，当终点和障碍物确定后，势力图也可以确定
 
         Args:
@@ -223,13 +226,11 @@ class AStarPlanner:
             oy (list): [障碍物y]
             reso (double): [网格分辨率m]
             rr (double): [机器人半径m]
-            sx (double): [起点x]
-            sy (double): [起点y]
 
         Returns:
             [list]: [势力图]
         """
-        pmap = [[0.0 for i in range(self.y_width)] for i in range(self.x_width)]
+        self.pmap = [[0.0 for i in range(self.y_width)] for i in range(self.x_width)]
 
         for ix in range(self.x_width):
             x = ix * reso +self.min_x
@@ -239,9 +240,15 @@ class AStarPlanner:
                 ug = self.calc_attractive_potential(x, y, gx, gy)
                 uo = self.calc_repulsive_potential(x, y, ox, oy, rr)
                 uf = ug + uo
-                pmap[ix][iy] = uf
+                self.pmap[ix][iy] = uf
 
-        return pmap
+        # 归一化
+        pmin = min(min(row) for row in self.pmap)
+        pmax = max(max(row) for row in self.pmap)
+
+        for ix in range(len(self.pmap)):
+            for iy in range(len(self.pmap[0])):
+                self.pmap[ix][iy] = (self.pmap[ix][iy]-pmin)/(pmax-pmin)
 
     def calc_attractive_potential(self, cx, cy, gx, gy):
         """计算引力
