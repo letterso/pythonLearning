@@ -255,12 +255,25 @@ def main():
     for i in range(-10, 61):
         ox.append(-10.0)
         oy.append(i)
+
     for i in range(-10, 40):
         ox.append(20.0)
         oy.append(i)
     for i in range(0, 40):
         ox.append(40.0)
         oy.append(60.0 - i)
+    for i in range(30, 40):
+        ox.append(i)
+        oy.append(20.0)
+    for i in range(40, 50):
+        ox.append(i)
+        oy.append(40.0)
+    for i in range(0, 20):
+        ox.append(i)
+        oy.append(40.0)
+    for i in range(20, 40):
+        ox.append(0)
+        oy.append(i)
 
     if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")

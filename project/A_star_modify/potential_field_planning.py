@@ -105,7 +105,7 @@ def oscillations_detection(previous_ids, ix, iy):
 
 
 def potential_field_planning(sx, sy, gx, gy, ox, oy, reso, rr):
-    """人工势场
+    """人工势场规划
 
     Args:
         sx ([type]): start x position

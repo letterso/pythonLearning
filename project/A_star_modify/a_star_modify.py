@@ -147,8 +147,17 @@ class AStarPlanner:
         return rx, ry
 
     def calc_heuristic(self, n1, n2):
+        """[summary]
+
+        Args:
+            n1 ([double]): [goal_node]
+            n2 ([double]): [open_set]
+
+        Returns:
+            [double]: [heuristic]
+        """
         w = 1.0  # weight of heuristic
-        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y) * self.pmap[n1.x][n2.y]
+        d = w * math.hypot(n1.x - n2.x, n1.y - n2.y) * self.pmap[n2.x][n2.y]
 
         return d
 
@@ -242,6 +251,7 @@ class AStarPlanner:
                 uf = ug + uo
                 self.pmap[ix][iy] = uf
 
+
         # 归一化
         pmin = min(min(row) for row in self.pmap)
         pmax = max(max(row) for row in self.pmap)
@@ -249,6 +259,11 @@ class AStarPlanner:
         for ix in range(len(self.pmap)):
             for iy in range(len(self.pmap[0])):
                 self.pmap[ix][iy] = (self.pmap[ix][iy]-pmin)/(pmax-pmin)
+        
+        #print(self.pmap)
+
+        self.draw_heatmap(self.pmap)
+        
 
     def calc_attractive_potential(self, cx, cy, gx, gy):
         """计算引力
@@ -288,7 +303,7 @@ class AStarPlanner:
 
         # 计算与最近障碍物的欧式距离
         dq = np.hypot(cx - ox[minid], cy - oy[minid])
-
+        
         # 判断是否小于机器人半径
         if dq <= rr:
             if dq <= 0.1:
@@ -298,6 +313,19 @@ class AStarPlanner:
             return 0.5 * ETA * (1.0 / dq - 1.0 / rr) ** 2
         else:
             return 0.0
+
+    def draw_heatmap(self, data):
+        data = np.array(data)  
+        #data = np.array(data).T
+        x_data = np.zeros([len(data),len(data[0])])
+        y_data = np.zeros([len(data),len(data[0])])
+        for y in range(len(data)):
+            for x in range(len(data[0])):
+                x_data[x][y] = self.calc_grid_position(x,self.min_x)
+                y_data[x][y] = self.calc_grid_position(y,self.min_y)
+
+        #data = data[:-1, :-1]
+        plt.pcolor(x_data, y_data, data, vmax=0.1,cmap=plt.cm.Blues)
 
     @staticmethod
     def get_motion_model():
@@ -339,12 +367,25 @@ def main():
     for i in range(-10, 61):
         ox.append(-10.0)
         oy.append(i)
+    
     for i in range(-10, 40):
         ox.append(20.0)
         oy.append(i)
     for i in range(0, 40):
         ox.append(40.0)
         oy.append(60.0 - i)
+    for i in range(30, 40):
+        ox.append(i)
+        oy.append(20.0)
+    for i in range(40, 50):
+        ox.append(i)
+        oy.append(40.0)
+    for i in range(0, 20):
+        ox.append(i)
+        oy.append(40.0)
+    for i in range(20, 40):
+        ox.append(0)
+        oy.append(i)
 
     if show_animation:  # pragma: no cover
         plt.plot(ox, oy, ".k")
